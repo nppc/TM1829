@@ -47,7 +47,7 @@ void sendCurrentRGB(uint8_t r, uint8_t g, uint8_t b){
 // SPI_Byte_Write (0x01); //send 1 (0b001)
 // 297 MCU cycles
 void sendPwmRGB(uint8_t r, uint8_t g, uint8_t b){
-  uint8_t adr;
+  uint8_t data *adr = SPI_pwm+0;
   // inverse it as we will use the bit as it is, but it need to be used inversed as middle bit is inversed (0 = 011, 1=001)
   if(r==255) r=254;  // remove last bit just in case as first byte cannot be all 1s
   r=~r;
@@ -59,17 +59,25 @@ void sendPwmRGB(uint8_t r, uint8_t g, uint8_t b){
   // 24 bits. 0xFF - means CURRENT
   // 8X3 bits. - RGB
   // SPI bits (9): 0R1 0R1 0R|1 0R1 0R1 0|R1 0R1 0R1| 0G1 0G1 0G|1 0G1 0G1 0|G1 0G1 0G1| 0B1 0B1 0B|1 0B1 0B1 0|B1 0B1 0B1
-  SPI_pwm[adr] = ((r & 0x80)>>1) | ((r & 0x40)>>3) | ((r & 0x20)>>5) | 0x24;
-  SPI_pwm[adr+1] = ((r & 0x10)<<1) | ((r & 0x08)>>1) | 0x92;
-  SPI_pwm[adr+2] = ((r & 0x04)<<5) | ((r & 0x02)<<3) | ((r & 0x01)<<1) | 0x49;
+  *adr = ((r & 0x80)>>1) | ((r & 0x40)>>3) | ((r & 0x20)>>5) | 0x24;
+  adr++;
+  *adr = ((r & 0x10)<<1) | ((r & 0x08)>>1) | 0x92;
+  adr++;
+  *adr = ((r & 0x04)<<5) | ((r & 0x02)<<3) | ((r & 0x01)<<1) | 0x49;
+  adr++;
 
-  SPI_pwm[adr+3] = ((g & 0x80)>>1) | ((g & 0x40)>>3) | ((g & 0x20)>>5) | 0x24;
-  SPI_pwm[adr+4] = ((g & 0x10)<<1) | ((g & 0x08)>>1) | 0x92;
-  SPI_pwm[adr+5] = ((g & 0x04)<<5) | ((g & 0x02)<<3) | ((g & 0x01)<<1) | 0x49;
+  *adr = ((g & 0x80)>>1) | ((g & 0x40)>>3) | ((g & 0x20)>>5) | 0x24;
+  adr++;
+  *adr = ((g & 0x10)<<1) | ((g & 0x08)>>1) | 0x92;
+  adr++;
+  *adr = ((g & 0x04)<<5) | ((g & 0x02)<<3) | ((g & 0x01)<<1) | 0x49;
+  adr++;
 
-  SPI_pwm[adr+6] = ((b & 0x80)>>1) | ((b & 0x40)>>3) | ((b & 0x20)>>5) | 0x24;
-  SPI_pwm[adr+7] = ((b & 0x10)<<1) | ((b & 0x08)>>1) | 0x92;
-  SPI_pwm[adr+8] = ((b & 0x04)<<5) | ((b & 0x02)<<3) | ((b & 0x01)<<1) | 0x49;
+  *adr = ((b & 0x80)>>1) | ((b & 0x40)>>3) | ((b & 0x20)>>5) | 0x24;
+  adr++;
+  *adr = ((b & 0x10)<<1) | ((b & 0x08)>>1) | 0x92;
+  adr++;
+  *adr = ((b & 0x04)<<5) | ((b & 0x02)<<3) | ((b & 0x01)<<1) | 0x49;
 
   //data_ready = true; // send data
 }
