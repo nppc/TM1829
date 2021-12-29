@@ -7,7 +7,7 @@
 // SPI_Byte_Write (0x03); //send 0 (0b011)
 // SPI_Byte_Write (0x01); //send 1 (0b001)
 // 198 MCU cycles
-void sendCurrentRGB(uint8_t r, uint8_t g, uint8_t b){
+void sendCurrentRGB(uint8_t r, uint8_t g, uint8_t b, bit test){
   uint8_t data *adr;
   bit buff; // idicate selected buffer
 
@@ -18,10 +18,10 @@ void sendCurrentRGB(uint8_t r, uint8_t g, uint8_t b){
 
   while(buf0_full & buf1_full); // wait if both buffers are full
   if(buf0_full){
-	*adr = SPI_buf1;
+	adr = SPI_buf1;
 	buff = 1;
   } else {
-	*adr = SPI_buf0;
+	adr = SPI_buf0;
 	buff = 0;
   }
   
@@ -47,7 +47,7 @@ void sendCurrentRGB(uint8_t r, uint8_t g, uint8_t b){
   adr++;
   *adr = ((b & 0x08)<<2) | (b & 0x04) | 0x92;
   adr++;
-  *adr = ((b & 0x02)<<6) | ((b & 0x01)<<4) | 0x4B;
+  *adr = ((b & 0x02)<<6) | ((b & 0x01)<<4) | (test ? 0x49 : 0x4B); //49 - test
 
   if(buff) buf1_full = true; else buf0_full = true; // data is ready for sending
 }
@@ -68,10 +68,10 @@ void sendPwmRGB(uint8_t r, uint8_t g, uint8_t b){
 
   while(buf0_full & buf1_full); // wait if both buffers are full
   if(buf0_full){
-	*adr = SPI_buf1;
+	adr = SPI_buf1;
 	buff = 1;
   } else {
-	*adr = SPI_buf0;
+	adr = SPI_buf0;
 	buff = 0;
   }
 
@@ -137,12 +137,3 @@ void sendCurrentRGB(uint8_t r, uint8_t g, uint8_t b){
 }
 #endif
 
-/*
-void oneWire_sendByte(uint8_t bt){
-  uint8_t i;
-  for(i=0;i<8;i++){
-
-  }
-
-}
-*/

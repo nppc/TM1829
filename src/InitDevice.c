@@ -8,6 +8,14 @@ void initHW(void){
   PCA0MD    = 0x08;
   PCA0CPM2  = 0x48;
 
+  // Timer2 configuration for delays
+  CKCON     = CKCON_T2ML__SYSCLK;
+  TMR2CN    = TMR2CN_TR2__RUN;
+  // 1ms period
+  TMR2RLL   = 0x4C;
+  TMR2RLH   = 0xA0;
+  IE_ET2 = 1;
+
   // Set internal oscillator to run at its maximum frequency
    OSCICN = OSCICN_IOSCEN__ENABLED |
             OSCICN_IFCN__HFOSC_DIV_1;
@@ -29,5 +37,4 @@ void initHW(void){
    SPI0CFG   = SPI0CFG_MSTEN__MASTER_ENABLED;  // Enable the SPI as a Master
    SPI0CN    = SPI0CN_SPIEN__ENABLED;  // 3-wire Single Master, SPI enabled
    IE_ESPI0  = 1;  // Enable SPI interrupts
-
 }

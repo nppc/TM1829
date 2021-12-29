@@ -14,5 +14,8 @@ extern bit buf1_full;
 extern uint8_t idata SPI_buf0[];
 extern uint8_t idata SPI_buf1[];
 
+extern uint16_t tmp_millis;
+extern bit delay_on;
+
 
 #endif /* SRC_MAIN_H_ */

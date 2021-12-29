@@ -9,17 +9,17 @@ SI_INTERRUPT(SPI0_ISR, SPI0_IRQn)
   if(buf0_full | buf1_full){
     if(buf_i==0){
 		if(buf0_full & cur_buf){ // set buffer 0 if buffer 0 is full and last was buffer 1
-			*bufadr = SPI_buf0;
+			bufadr = SPI_buf0;
 			cur_buf = 0;
 		}else if(buf1_full & !cur_buf){ // set buffer 1 if buffer 1 is full and last was buffer 0
-			*bufadr = SPI_buf1;
+			bufadr = SPI_buf1;
 			cur_buf = 1;
 		}else{ // if we need to work with not expected buffer, then nothing to do, we need to read the buffer provided
 			if(buf0_full){
-				*bufadr = SPI_buf0;
+				bufadr = SPI_buf0;
 				cur_buf = 0;
 			}else{
-				*bufadr = SPI_buf1;
+				bufadr = SPI_buf1;
 				cur_buf = 1;
 			}
 		}
@@ -28,7 +28,7 @@ SI_INTERRUPT(SPI0_ISR, SPI0_IRQn)
 	SPI0DAT = bufadr[buf_i];
 	buf_i++;
 	// should we finish sending buffer?
-	if(buf_i>=sizeof(SPI_buf0)){
+	if(buf_i>=(SPIBITS * 3)){
 		buf_i = 0; // reset buffer index
 		if(cur_buf) buf1_full = false; else buf0_full = false; // indicate that buffer is empty
 	}
@@ -41,3 +41,16 @@ SI_INTERRUPT(SPI0_ISR, SPI0_IRQn)
 
 }
 
+
+// every 1ms timer
+SI_INTERRUPT (TIMER2_ISR, TIMER2_IRQn)
+  {
+    // advance delay timer
+    if(delay_on) {
+        if(tmp_millis!=0)
+          { tmp_millis--;}
+        else
+          { delay_on=0;}
+    }
+    TMR2CN_TF2H = 0;
+  }
