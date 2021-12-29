@@ -8,13 +8,23 @@
 // SPI_Byte_Write (0x01); //send 1 (0b001)
 // 198 MCU cycles
 void sendCurrentRGB(uint8_t r, uint8_t g, uint8_t b){
-  uint8_t data *adr = SPI_cur+0;
+  uint8_t data *adr;
+  bit buff; // idicate selected buffer
+
   // inverse it as we will use the bit as it is, but it need to be used inversed as middle bit is inversed (0 = 011, 1=001)
   r=~r;
   g=~g;
   b=~b;
-  //adr = adrREG;
-  while(data_ready); // wait for all data to be sent
+
+  while(buf0_full & buf1_full); // wait if both buffers are full
+  if(buf0_full){
+	*adr = SPI_buf1;
+	buff = 1;
+  } else {
+	*adr = SPI_buf0;
+	buff = 0;
+  }
+  
   // first - prepare an array for sending
   // First byte = 0xFF - means CURRENT
   // SPI bits: 001 001 00|1 001 001 0|01 001 001 (0x24, 0x92, 0x49)
@@ -39,7 +49,7 @@ void sendCurrentRGB(uint8_t r, uint8_t g, uint8_t b){
   adr++;
   *adr = ((b & 0x02)<<6) | ((b & 0x01)<<4) | 0x4B;
 
-  //data_ready = true; // send data
+  if(buff) buf1_full = true; else buf0_full = true; // data is ready for sending
 }
 
 // 3bit SPI for 1bit OneWireLED
@@ -47,14 +57,24 @@ void sendCurrentRGB(uint8_t r, uint8_t g, uint8_t b){
 // SPI_Byte_Write (0x01); //send 1 (0b001)
 // 297 MCU cycles
 void sendPwmRGB(uint8_t r, uint8_t g, uint8_t b){
-  uint8_t data *adr = SPI_pwm+0;
+  uint8_t data *adr;
+  bit buff; // idicate selected buffer
+
   // inverse it as we will use the bit as it is, but it need to be used inversed as middle bit is inversed (0 = 011, 1=001)
   if(r==255) r=254;  // remove last bit just in case as first byte cannot be all 1s
   r=~r;
   g=~g;
   b=~b;
-  adr=0;
-  while(data_ready); // wait for all data to be sent
+
+  while(buf0_full & buf1_full); // wait if both buffers are full
+  if(buf0_full){
+	*adr = SPI_buf1;
+	buff = 1;
+  } else {
+	*adr = SPI_buf0;
+	buff = 0;
+  }
+
   // first - prepare an array for sending
   // 24 bits. 0xFF - means CURRENT
   // 8X3 bits. - RGB
@@ -79,7 +99,7 @@ void sendPwmRGB(uint8_t r, uint8_t g, uint8_t b){
   adr++;
   *adr = ((b & 0x04)<<5) | ((b & 0x02)<<3) | ((b & 0x01)<<1) | 0x49;
 
-  //data_ready = true; // send data
+  if(buff) buf1_full = true; else buf0_full = true; // data is ready for sending
 }
 
 #endif

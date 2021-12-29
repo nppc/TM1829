@@ -3,10 +3,11 @@
 #include "tm1829.h"
 #include "spi.h"
 
-volatile bit data_ready = 0; // nothing to send
-volatile bit data_pwm; // if 1 then pwm data is sending
-volatile uint8_t idata SPI_cur[3 * SPIBITS]; // N bytes to send via SPI (3 bytes of OneWire data)
-volatile uint8_t idata SPI_pwm[3 * SPIBITS]; // N bytes to send via SPI (3 bytes of OneWire data)
+volatile bit buf0_full = 0; // nothing to send
+volatile bit buf1_full = 0; // nothing to send
+
+volatile uint8_t idata SPI_buf0[3 * SPIBITS]; // N bytes to send via SPI (3 bytes of OneWire data)
+volatile uint8_t idata SPI_buf1[3 * SPIBITS]; // N bytes to send via SPI (3 bytes of OneWire data)
 
 //-----------------------------------------------------------------------------
 // SiLabs_Startup() Routine
@@ -22,7 +23,6 @@ void SiLabs_Startup (void)
 }
  
 
-//SI_INTERRUPT_PROTO(SPI0_ISR, SPI0_IRQn);
 //-----------------------------------------------------------------------------
 // main() Routine
 //-----------------------------------------------------------------------------
@@ -40,34 +40,8 @@ void main (void)
   sendCurrentRGB(0,0,0); // 0 - 31
   sendPwmRGB(255,255,255); // 0 = 255
 
-
-
    while (1)
    {
-       for(i=0;i<20;i++){
-         for(i1=0;i1<250;i1++){
-             SPI_Byte_Write(0xFF); // hold line high
-         }
-       }
-
-
-       for(i=0;i<7;i++){
-           for(i1=0;i1<9;i1++){
-               SPI_Byte_Write(SPI_cur[i1]); // hold line high
-           }
-       }
-
-       for(i=0;i<20;i++){
-         for(i1=0;i1<250;i1++){
-             SPI_Byte_Write(0xFF); // hold line high
-         }
-       }
-
-       for(i=0;i<3;i++){
-           for(i1=0;i1<9;i1++){
-               SPI_Byte_Write(SPI_pwm[i1]); // hold line high
-           }
-       }
-
+		
    }
 }

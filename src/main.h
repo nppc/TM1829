@@ -8,11 +8,11 @@
 SI_SBIT(GND, SFR_P1, 5); // debug
 
 
-extern bit data_ready; // data on SPI0
-extern bit data_pwm; // what to send pwm or current
+extern bit buf0_full;  
+extern bit buf1_full; 
 
-extern uint8_t idata SPI_cur[];
-extern uint8_t idata SPI_pwm[];
+extern uint8_t idata SPI_buf0[];
+extern uint8_t idata SPI_buf1[];
 
 
 #endif /* SRC_MAIN_H_ */
