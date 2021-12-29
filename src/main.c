@@ -1,6 +1,7 @@
 #include "main.h"
 #include "InitDevice.h"
 #include "tm1829.h"
+#include "spi.h"
 
 volatile bit data_ready = 0; // nothing to send
 volatile bit data_pwm; // if 1 then pwm data is sending
@@ -27,37 +28,46 @@ void SiLabs_Startup (void)
 //-----------------------------------------------------------------------------
 void main (void)
 {
-//   uint8_t test_value = 0x55;
-//   uint8_t test_array[MAX_BUFFER_SIZE] = {1,2,3,4,5,6,7,8};
-//   uint8_t i;
-  //bit b = 0;
+   uint8_t i;
+   uint8_t i1;
 
   initHW();
   GND = 0;
 
-   //IE_EA = 1;                          // Enable global interrupts
+   //IE_EA = 1; // Enable global interrupts
 
-  PCA0 = 0; // DEBUG reset counter
-  sendCurrentRGB(3,2,1); // 0 - 31
-                                       // finished
-/*
-   // Copy test_array into SPI_Data_Array
-   for (i = 0; i < MAX_BUFFER_SIZE; i++)
-   {
-      SPI_Data_Array[i] = test_array[i];
-   }
-
-   // Send the array to the slave
-   SPI_Array_Write ();
-
-   while (!SPI0CN_NSSMD0);             // Wait until the Write transfer has
-*/                                       // finished
+  //PCA0 = 0; // DEBUG reset counter
+  sendCurrentRGB(0,0,0); // 0 - 31
+  sendPwmRGB(255,255,255); // 0 = 255
 
 
-   // END OF TEST -------------------------------------------------------------
 
    while (1)
    {
+       for(i=0;i<20;i++){
+         for(i1=0;i1<250;i1++){
+             SPI_Byte_Write(0xFF); // hold line high
+         }
+       }
+
+
+       for(i=0;i<7;i++){
+           for(i1=0;i1<9;i1++){
+               SPI_Byte_Write(SPI_cur[i1]); // hold line high
+           }
+       }
+
+       for(i=0;i<20;i++){
+         for(i1=0;i1<250;i1++){
+             SPI_Byte_Write(0xFF); // hold line high
+         }
+       }
+
+       for(i=0;i<3;i++){
+           for(i1=0;i1<9;i1++){
+               SPI_Byte_Write(SPI_pwm[i1]); // hold line high
+           }
+       }
 
    }
 }
