@@ -2,11 +2,21 @@
 #include "main.h"
 #include "spi.h"
 
-#if SPIBITS == 3
-// 3bit SPI for 1bit OneWireLED
+// bit addressible variable
+bdata unsigned char btmp;
+sbit btmp0 = btmp^0;
+sbit btmp1 = btmp^1;
+sbit btmp2 = btmp^2;
+sbit btmp3 = btmp^3;
+sbit btmp4 = btmp^4;
+sbit btmp5 = btmp^5;
+sbit btmp6 = btmp^6;
+sbit btmp7 = btmp^7;
+
+// 3bits of SPI for 1bit OneWireLED
 // SPI_Byte_Write (0x03); //send 0 (0b011)
 // SPI_Byte_Write (0x01); //send 1 (0b001)
-// 198 MCU cycles
+// 176 MCU cycles
 void sendCurrentRGB(uint8_t r, uint8_t g, uint8_t b, bit test){
   uint8_t data *adr;
   bit buff; // idicate selected buffer
@@ -37,25 +47,31 @@ void sendCurrentRGB(uint8_t r, uint8_t g, uint8_t b, bit test){
 
   // 5X3 bits. - RGB current + T bit (0 - it is not a test)
   // SPI bits: 0R1 0R1 0R|1 0R1 0R1 0|G1 0G1 0G1| 0G1 0G1 0B|1 0B1 0B1 0|B1 0B1 011
-  *adr = ((r & 0x10)<<2) | (r & 0x08) | ((r & 0x04)>>2) | 0x24;
+  btmp = 0x24; btmp6 = (r & 0x10); btmp3 = (r & 0x08); btmp0 = (r & 0x04);
+  *adr = btmp;
   adr++;
-  *adr = ((r & 0x02)<<4) | ((r & 0x01)<<2) | 0x92;
+  btmp = 0x92; btmp5 = (r & 0x02); btmp2 = (r & 0x01);
+  *adr = btmp;
   adr++;
-  *adr = ((g & 0x10)<<3) | ((g & 0x08)<<1) | ((g & 0x04)>>1) | 0x49;
+  btmp = 0x49; btmp7 = (g & 0x10); btmp4 = (g & 0x08); btmp1 = (g & 0x04);
+  *adr = btmp;
   adr++;
-  *adr = ((g & 0x02)<<5) | ((g & 0x01)<<3) | ((b & 0x10)>>4) | 0x24;
+  btmp = 0x24; btmp6 = (g & 0x02); btmp3 = (g & 0x01); btmp0 = (b & 0x10);
+  *adr = btmp;
   adr++;
-  *adr = ((b & 0x08)<<2) | (b & 0x04) | 0x92;
+  btmp = 0x92; btmp5 = (b & 0x08); btmp2 = (b & 0x04);
+  *adr = btmp;
   adr++;
-  *adr = ((b & 0x02)<<6) | ((b & 0x01)<<4) | (test ? 0x49 : 0x4B); //49 - test
+  btmp = (test ? 0x49 : 0x4B); btmp7 = (b & 0x02); btmp4 = (b & 0x01);
+  *adr = btmp;
 
   if(buff) buf1_full = true; else buf0_full = true; // data is ready for sending
 }
 
-// 3bit SPI for 1bit OneWireLED
+// 3bits of SPI for 1bit OneWireLED
 // SPI_Byte_Write (0x03); //send 0 (0b011)
 // SPI_Byte_Write (0x01); //send 1 (0b001)
-// 297 MCU cycles
+// 218 MCU cycles
 void sendPwmRGB(uint8_t r, uint8_t g, uint8_t b){
   uint8_t data *adr;
   bit buff; // idicate selected buffer
@@ -79,61 +95,35 @@ void sendPwmRGB(uint8_t r, uint8_t g, uint8_t b){
   // 24 bits. 0xFF - means CURRENT
   // 8X3 bits. - RGB
   // SPI bits (9): 0R1 0R1 0R|1 0R1 0R1 0|R1 0R1 0R1| 0G1 0G1 0G|1 0G1 0G1 0|G1 0G1 0G1| 0B1 0B1 0B|1 0B1 0B1 0|B1 0B1 0B1
-  *adr = ((r & 0x80)>>1) | ((r & 0x40)>>3) | ((r & 0x20)>>5) | 0x24;
+  btmp = 0x24; btmp6 = (r & 0x80); btmp3 = (r & 0x40); btmp0 = (r & 0x20);
+  *adr = btmp;
   adr++;
-  *adr = ((r & 0x10)<<1) | ((r & 0x08)>>1) | 0x92;
+  btmp = 0x92; btmp5 = (r & 0x10); btmp2 = (r & 0x08);
+  *adr = btmp;
   adr++;
-  *adr = ((r & 0x04)<<5) | ((r & 0x02)<<3) | ((r & 0x01)<<1) | 0x49;
-  adr++;
-
-  *adr = ((g & 0x80)>>1) | ((g & 0x40)>>3) | ((g & 0x20)>>5) | 0x24;
-  adr++;
-  *adr = ((g & 0x10)<<1) | ((g & 0x08)>>1) | 0x92;
-  adr++;
-  *adr = ((g & 0x04)<<5) | ((g & 0x02)<<3) | ((g & 0x01)<<1) | 0x49;
+  btmp = 0x49; btmp7 = (r & 0x04); btmp4 = (r & 0x02); btmp1 = (r & 0x01);
+  *adr = btmp;
   adr++;
 
-  *adr = ((b & 0x80)>>1) | ((b & 0x40)>>3) | ((b & 0x20)>>5) | 0x24;
+  btmp = 0x24; btmp6 = (g & 0x80); btmp3 = (g & 0x40); btmp0 = (g & 0x20);
+  *adr = btmp;
   adr++;
-  *adr = ((b & 0x10)<<1) | ((b & 0x08)>>1) | 0x92;
+  btmp = 0x92; btmp5 = (g & 0x10); btmp2 = (g & 0x08);
+  *adr = btmp;
   adr++;
-  *adr = ((b & 0x04)<<5) | ((b & 0x02)<<3) | ((b & 0x01)<<1) | 0x49;
+  btmp = 0x49; btmp7 = (g & 0x04); btmp4 = (g & 0x02); btmp1 = (g & 0x01);
+  *adr = btmp;
+  adr++;
+
+  btmp = 0x24; btmp6 = (b & 0x80); btmp3 = (b & 0x40); btmp0 = (b & 0x20);
+  *adr = btmp;
+  adr++;
+  btmp = 0x92; btmp5 = (b & 0x10); btmp2 = (b & 0x08);
+  *adr = btmp;
+  adr++;
+  btmp = 0x49; btmp7 = (b & 0x04); btmp4 = (b & 0x02); btmp1 = (b & 0x01);
+  *adr = btmp;
 
   if(buff) buf1_full = true; else buf0_full = true; // data is ready for sending
 }
-
-#endif
-
-#if SPIBITS == 8
-// 8bit SPI for 1bit OneWireLED
-// SPI_Byte_Write (0x3F); //send 0 (0b00111111)
-// SPI_Byte_Write (0x07); //send 1 (0b00000111)
-// 504 MCU cycles
-void sendCurrentRGB(uint8_t r, uint8_t g, uint8_t b){
-  uint8_t i, mask;
-  while(data_ready); // wait for all data to be sent
-  // first - prepare an array for sending
-  // 8 bits. 0xFF - means CURRENT
-  for(i=0;i<8;i++){
-      SPI_cur[i] = 0x3F;
-  }
-  // 5 bits. - RED current
-  mask = 0x10; // 0b00010000
-  for(i=0;i<5;i++){
-      SPI_cur[8+i] = ((r & mask) == 0 ? 0x3F : 0x07);
-      SPI_cur[8+i+5] = ((g & mask) == 0 ? 0x3F : 0x07);
-      SPI_cur[8+i+10] = ((b & mask) == 0 ? 0x3F : 0x07);
-      mask = mask >> 1;
-  }
-  SPI_cur[23] = 0x07; // it is not test
-  data_ready = true; // send data
-
-
-  // we assume that line is high
-//  IE_EA = 0; // disable interrupts
-//  data_sending = 1; // we initiating a data send
-//  // send first data
-//  IE_EA = 1; // enable interrupts
-}
-#endif
 

@@ -33,33 +33,34 @@ void SiLabs_Startup (void)
 //-----------------------------------------------------------------------------
 void main (void)
 {
-  uint8_t r = 0;
-  uint8_t g = 0;
-  uint8_t b = 0;
-  uint8_t rc = 0;
-  uint8_t gc = 0;
-  uint8_t bc = 0;
-  bit test = true;
+  uint8_t i;
+  uint8_t r = 255;
+  uint8_t g = 200;
+  uint8_t b = 50;
+  uint8_t rc = 31;
+  uint8_t gc = 1;
+  uint8_t bc = 10;
+  bit test = false;
 
   initHW();
   GND = 0;
 
   IE_EA = 1; // Enable global interrupts
-
-  SPI_Byte_Write(0x00); // start interrupts
+  SPI_Byte_Write(0xFF); // start SPI0 flow
+  SPI_Byte_Write(0xFF); // and prefill the buffer
 
   delay_ms(100);
 
    while (1)
    {
        delay_ms(10);
-       sendCurrentRGB(bc,rc,gc, test); // 0 - 31
-       sendCurrentRGB(0,0,0, true); // 0 - 31
-       sendCurrentRGB(bc,rc,gc, test); // 0 - 31
-       delay_ms(10);
-       sendPwmRGB(b,r,g); // 0 = 255
-       sendPwmRGB(b,r,g); // 0 = 255
-       sendPwmRGB(b,r,g); // 0 = 255
+       for(i=0;i<7;i++){
+           sendCurrentRGB(bc,rc,gc, test); // 0 - 31
+       }
+       delay_ms(2);
+       for(i=0;i<7;i++){
+           sendPwmRGB(b,r,g); // 0 = 255
+       }
        delay_ms(100);
    }
 }

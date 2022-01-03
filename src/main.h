@@ -17,5 +17,10 @@ extern uint8_t idata SPI_buf1[];
 extern uint16_t tmp_millis;
 extern bit delay_on;
 
+typedef struct {
+  uint8_t r;
+  uint8_t g;
+  uint8_t b;
+} rgb_t;
 
 #endif /* SRC_MAIN_H_ */
