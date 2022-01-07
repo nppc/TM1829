@@ -3,6 +3,7 @@
 #include "tm1829.h"
 #include "spi.h"
 #include "gen.h"
+#include "button.h"
 
 volatile bit buf0_full = 0; // nothing to send
 volatile bit buf1_full = 0; // nothing to send
@@ -11,7 +12,11 @@ volatile uint8_t idata SPI_buf0[3 * SPIBITS]; // N bytes to send via SPI (3 byte
 volatile uint8_t idata SPI_buf1[3 * SPIBITS]; // N bytes to send via SPI (3 bytes of OneWire data)
 
 volatile uint16_t tmp_millis;
-volatile bit delay_on = 0;
+volatile bit delay_on = false;
+
+//volatile bit fadetick;
+volatile fader_t fader;
+volatile uint8_t fade_ms_cntr = 0;
 
 
 //-----------------------------------------------------------------------------
@@ -34,33 +39,28 @@ void SiLabs_Startup (void)
 void main (void)
 {
   uint8_t i;
-  uint8_t r = 255;
-  uint8_t g = 200;
-  uint8_t b = 50;
-  uint8_t rc = 31;
-  uint8_t gc = 1;
-  uint8_t bc = 10;
-  bit test = false;
+  
+  fader.cntr_step = 0;
+  fader.cntr_led = 0;
+  fader.state = FADE_OUT;
 
   initHW();
-  GND = 0;
+  PIN_GND = 0;
 
   IE_EA = 1; // Enable global interrupts
   SPI_Byte_Write(0xFF); // start SPI0 flow
   SPI_Byte_Write(0xFF); // and prefill the buffer
 
-  delay_ms(100);
+  delay_ms(50);
+
+  for(i=0;i<LEDS_TOTAL;i++){
+	sendCurrentRGB(CURRENT_B,CURRENT_R,CURRENT_G, false); // 0 - 31
+  }
+  delay_ms(5);
 
    while (1)
    {
-       delay_ms(10);
-       for(i=0;i<7;i++){
-           sendCurrentRGB(bc,rc,gc, test); // 0 - 31
-       }
-       delay_ms(2);
-       for(i=0;i<7;i++){
-           sendPwmRGB(b,r,g); // 0 = 255
-       }
-       delay_ms(100);
+		processButtons();
+		fade();
    }
 }

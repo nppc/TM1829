@@ -127,3 +127,25 @@ void sendPwmRGB(uint8_t r, uint8_t g, uint8_t b){
   if(buff) buf1_full = true; else buf0_full = true; // data is ready for sending
 }
 
+void fade(void){
+	uint8_t r;
+	uint8_t g;
+	uint8_t b;
+	if((fader.cntr_step == 0 && fader.state == FADE_OUT) || (fader.cntr_step == 255 && fader.state == FADE_IN) || fade_ms_cntr != 0) return;
+	
+	if(fader.state == FADE_IN){fader.cntr_step++;}else{fader.cntr_step--;}
+	// get current RGB values according to fade counter
+	//r = (uint16_t)COLOR_R * fader.cntr_step / 255;
+	r = fader.cntr_step;
+	g = (uint16_t)COLOR_G * fader.cntr_step / 255;
+	b = (uint16_t)COLOR_B * fader.cntr_step / 255;
+	
+	sendPwmRGB(b,r,g);
+	
+	fader.cntr_led++;
+	if(fader.cntr_led == LEDS_TOTAL){
+		// stop sending data
+		fader.cntr_led == 0;
+		fade_ms_cntr = FADE_DELAY;
+	}
+}

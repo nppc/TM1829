@@ -1,5 +1,6 @@
 //#pragma src
 #include "main.h"
+#include "button.h"
 
 SI_INTERRUPT(SPI0_ISR, SPI0_IRQn)
 {
@@ -50,7 +51,14 @@ SI_INTERRUPT (TIMER2_ISR, TIMER2_IRQn)
         if(tmp_millis!=0)
           { tmp_millis--;}
         else
-          { delay_on=0;}
+          { delay_on=false;}
     }
+	
+	// button routines
+	if(buttonLastState) buttonTmr++;
+	
+	// fade rgb
+	if(fade_ms_cntr != 0) fade_ms_cntr--;
+
     TMR2CN_TF2H = 0;
   }
