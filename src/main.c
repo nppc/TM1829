@@ -42,7 +42,7 @@ void main (void)
   
   fader.cntr_step = 0;
   fader.cntr_led = 0;
-  fader.state = FADE_OUT;
+  fader.state = FADE_NOTHING;
 
   initHW();
   PIN_GND = 0;

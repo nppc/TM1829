@@ -12,7 +12,7 @@
 #define  CURRENT_R  31
 #define  CURRENT_G  1
 #define  CURRENT_B  10
-#define FADE_DELAY 5
+#define FADE_DELAY 3
 
 extern bit buf0_full;  
 extern bit buf1_full; 
@@ -20,7 +20,7 @@ extern bit buf1_full;
 extern uint8_t idata SPI_buf0[];
 extern uint8_t idata SPI_buf1[];
 
-typedef enum {FADE_OUT, FADE_IN} fader_e;
+typedef enum {FADE_OUT, FADE_IN, FADE_NOTHING} fader_e;
 typedef struct {
   //float r;
   //float g;

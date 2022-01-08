@@ -2,6 +2,7 @@
 // Button routines
 #include "button.h"
 #include "tm1829.h"
+#include "gen.h"
 
 volatile uint16_t buttonTmr;
 volatile bool buttonLastState;
@@ -54,8 +55,10 @@ void processButtons(void){
 
 void buttonAction(bool butPwr){
   if(butPwr){
-    if(fader.state == FADE_OUT){
+    if(fader.state == FADE_OUT || fader.cntr_step == 0){
         fader.state = FADE_IN;
+        //delay_ms(5);
+        //sendCurrentRGB(CURRENT_B,CURRENT_R,CURRENT_G, false); // 0 - 31
     }else{
         fader.state = FADE_OUT;
     }

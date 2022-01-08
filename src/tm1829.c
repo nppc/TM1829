@@ -1,6 +1,7 @@
 //#pragma src
 #include "main.h"
 #include "spi.h"
+#include "gen.h"
 
 // bit addressible variable
 bdata unsigned char btmp;
@@ -131,9 +132,12 @@ void fade(void){
 	uint8_t r;
 	uint8_t g;
 	uint8_t b;
-	if((fader.cntr_step == 0 && fader.state == FADE_OUT) || (fader.cntr_step == 255 && fader.state == FADE_IN) || fade_ms_cntr != 0) return;
+	if(fader.state == FADE_NOTHING || fade_ms_cntr != 0) return;
+//	if((fader.cntr_step == 0 && fader.state == FADE_OUT) || (fader.cntr_step == 255 && fader.state == FADE_IN) || fade_ms_cntr != 0) return;
 	
-	if(fader.state == FADE_IN){fader.cntr_step++;}else{fader.cntr_step--;}
+	if(fader.cntr_led==0){// change fade step after all leds refreshed
+	    if(fader.state == FADE_IN){fader.cntr_step++;}else{fader.cntr_step--;}
+	}
 	// get current RGB values according to fade counter
 	//r = (uint16_t)COLOR_R * fader.cntr_step / 255;
 	r = fader.cntr_step;
@@ -145,7 +149,14 @@ void fade(void){
 	fader.cntr_led++;
 	if(fader.cntr_led == LEDS_TOTAL){
 		// stop sending data
-		fader.cntr_led == 0;
+		fader.cntr_led = 0;
 		fade_ms_cntr = FADE_DELAY;
+		// did we finished fade process?
+		if((fader.cntr_step == 0 && fader.state == FADE_OUT) || (fader.cntr_step == 255 && fader.state == FADE_IN)){
+		    fader.state = FADE_NOTHING;
+		    //delay_ms(5);
+		    //sendCurrentRGB(CURRENT_B,CURRENT_R,CURRENT_G, true); // 0 - 31
+
+		}
 	}
 }

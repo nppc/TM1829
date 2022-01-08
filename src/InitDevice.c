@@ -19,6 +19,7 @@ void initHW(void){
   // Set internal oscillator to run at its maximum frequency
    OSCICN = OSCICN_IOSCEN__ENABLED |
             OSCICN_IFCN__HFOSC_DIV_1;
+   //OSCICRS -= 2; // slow down a bit
 
    // Port init
    P1MDOUT   = P1MDOUT_B4__PUSH_PULL | P1MDOUT_B5__PUSH_PULL; // debug on 1.5
