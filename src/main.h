@@ -12,6 +12,7 @@
 #define  CURRENT_R  31
 #define  CURRENT_G  1
 #define  CURRENT_B  10
+
 #define FADE_DELAY 3
 
 extern bit buf0_full;  
@@ -22,26 +23,14 @@ extern uint8_t idata SPI_buf1[];
 
 typedef enum {FADE_OUT, FADE_IN, FADE_NOTHING} fader_e;
 typedef struct {
-  //float r;
-  //float g;
-  //float b;
   uint8_t cntr_step; // current fade step (0-255)
   uint8_t cntr_led; // current led (0-6)
   fader_e state; // should we change light?
 } fader_t;
 
-//extern bit fadetick;
 extern fader_t fader;
 extern uint8_t fade_ms_cntr;
 
-extern uint16_t tmp_millis;
-extern bit delay_on;
+extern bit timer1ms_tick;
 
-/*
-typedef struct {
-  uint8_t r;
-  uint8_t g;
-  uint8_t b;
-} rgb_t;
-*/
 #endif /* SRC_MAIN_H_ */
